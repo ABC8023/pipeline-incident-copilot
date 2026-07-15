@@ -5,6 +5,7 @@ from typing import Awaitable, Callable
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 
+from pipeline_copilot.api.routes.analysis import router as analysis_router
 from pipeline_copilot.api.routes.health import router as health_router
 from pipeline_copilot.api.routes.incidents import router as incidents_router
 from pipeline_copilot.core.config import AppConfig
@@ -37,4 +38,5 @@ def create_app(config: AppConfig, token: str) -> FastAPI:
     )
     app.include_router(health_router, dependencies=[Depends(require_token)])
     app.include_router(incidents_router, dependencies=[Depends(require_token)])
+    app.include_router(analysis_router, dependencies=[Depends(require_token)])
     return app
