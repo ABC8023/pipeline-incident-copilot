@@ -6,7 +6,9 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 
 from pipeline_copilot.api.routes.health import router as health_router
+from pipeline_copilot.api.routes.incidents import router as incidents_router
 from pipeline_copilot.core.config import AppConfig
+from pipeline_copilot.storage.incident_repository import IncidentRepository
 
 
 def create_app(config: AppConfig, token: str) -> FastAPI:
@@ -30,5 +32,9 @@ def create_app(config: AppConfig, token: str) -> FastAPI:
 
     app.state.config = config
     app.state.token_dependency = require_token
+    app.state.incident_repository = IncidentRepository(
+        config.workspace, config.max_bundle_bytes, config.max_log_bytes
+    )
     app.include_router(health_router, dependencies=[Depends(require_token)])
+    app.include_router(incidents_router, dependencies=[Depends(require_token)])
     return app
